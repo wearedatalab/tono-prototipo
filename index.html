@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#241B2B">
+<title>tono. — Entrena con los mejores, donde estés</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+/* ---------- hero ---------- */
+.hero {
+  position: relative; min-height: 100svh; display: flex; align-items: flex-end;
+  color: var(--crema); overflow: hidden;
+}
+.hero img.bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 65% center; }
+.hero::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(100deg, rgba(36,27,43,.82) 8%, rgba(36,27,43,.42) 46%, rgba(36,27,43,.08) 72%),
+              linear-gradient(0deg, rgba(36,27,43,.55) 0%, transparent 38%);
+}
+.hero-in { position: relative; z-index: 2; width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 24px 72px; }
+.hero .eyebrow { display: inline-flex; align-items: center; gap: 10px; font-size: .85rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; opacity: .9; margin-bottom: 22px; }
+.hero .eyebrow::before { content: ''; width: 34px; height: 2px; background: var(--coral); }
+.hero h1 { font-size: clamp(2.7rem, 7vw, 5.6rem); font-weight: 800; max-width: 12ch; margin-bottom: 22px; }
+.hero h1 em { font-style: normal; color: var(--coral); }
+.hero p.sub { font-size: clamp(1.05rem, 1.6vw, 1.25rem); max-width: 46ch; opacity: .92; margin-bottom: 34px; }
+.hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 40px; }
+.hero-cats { display: flex; gap: 10px; flex-wrap: wrap; }
+.hero-cats a {
+  padding: 9px 18px; border-radius: 999px; border: 1px solid rgba(246,241,233,.4);
+  font-size: .88rem; font-weight: 600; backdrop-filter: blur(6px); background: rgba(36,27,43,.25);
+  transition: all .16s ease;
+}
+.hero-cats a:hover { background: var(--crema); color: var(--tinta); border-color: var(--crema); }
+
+/* entrada del hero */
+.hero .eyebrow, .hero h1, .hero .sub, .hero-ctas, .hero-cats { opacity: 0; transform: translateY(28px); animation: up .8s cubic-bezier(.2,.7,.2,1) forwards; }
+.hero h1 { animation-delay: .1s; } .hero .sub { animation-delay: .2s; }
+.hero-ctas { animation-delay: .3s; } .hero-cats { animation-delay: .42s; }
+@keyframes up { to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .hero * { animation: none !important; opacity: 1 !important; transform: none !important; } }
+
+/* ---------- marquee ---------- */
+.marq { background: var(--tinta); color: var(--crema); overflow: hidden; padding: 18px 0; }
+.marq-track { display: flex; gap: 60px; white-space: nowrap; animation: marq 26s linear infinite; width: max-content; }
+.marq span { font-family: var(--f-display); font-weight: 600; font-size: 1.05rem; opacity: .92; }
+.marq i { font-style: normal; color: var(--coral); margin-right: 14px; }
+@keyframes marq { to { transform: translateX(-50%); } }
+
+/* ---------- categorías ---------- */
+.cats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; }
+.cat-tile { position: relative; border-radius: var(--r); overflow: hidden; aspect-ratio: 3/4; display: flex; align-items: flex-end; color: var(--crema); }
+.cat-tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+.cat-tile::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(36,27,43,.75), transparent 55%); }
+.cat-tile:hover img { transform: scale(1.07); }
+.cat-tile span { position: relative; z-index: 2; padding: 18px; font-family: var(--f-display); font-weight: 700; font-size: 1.15rem; }
+@media (max-width: 1020px) { .cats-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 640px) { .cats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } }
+
+/* ---------- instructores ---------- */
+.sec-inst { background: var(--crema-2); }
+.inst-rail { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+@media (max-width: 1020px) { .inst-rail { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .inst-rail { grid-template-columns: 1fr; } }
+.icard { position: relative; border-radius: var(--r); overflow: hidden; aspect-ratio: 4/5; display: flex; align-items: flex-end; color: var(--crema); box-shadow: var(--sombra); }
+.icard img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+.icard::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(36,27,43,.85) 4%, transparent 52%); }
+.icard:hover img { transform: scale(1.05); }
+.icard .info { position: relative; z-index: 2; padding: 24px; width: 100%; }
+.icard .rol { font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--lila); margin-bottom: 6px; }
+.icard h3 { font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+.icard .check { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--coral); font-size: .65rem; }
+.icard .meta { font-size: .88rem; opacity: .85; margin-top: 4px; }
+
+/* ---------- cómo funciona ---------- */
+.pasos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--linea); }
+.paso { padding: 44px 34px 44px 0; border-bottom: 1px solid var(--linea); }
+.paso + .paso { padding-left: 34px; border-left: 1px solid var(--linea); }
+.paso .num { font-family: var(--f-display); font-size: 3.6rem; font-weight: 800; color: var(--coral); line-height: 1; margin-bottom: 18px; }
+.paso h3 { font-size: 1.35rem; margin-bottom: 10px; }
+.paso p { color: var(--tinta-60); font-size: .98rem; }
+@media (max-width: 860px) { .pasos { grid-template-columns: 1fr; } .paso + .paso { padding-left: 0; border-left: none; } .paso { padding: 34px 0; } }
+
+/* ---------- app / pwa ---------- */
+.sec-app { background: var(--ciruela); color: var(--crema); overflow: hidden; }
+.app-flex { display: flex; align-items: center; gap: 70px; }
+.app-txt { flex: 1; }
+.app-txt h2 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 20px; }
+.app-txt p { opacity: .85; max-width: 46ch; margin-bottom: 12px; }
+.phone {
+  width: 280px; flex-shrink: 0; border-radius: 42px; border: 10px solid var(--tinta);
+  background: var(--tinta); box-shadow: 0 40px 80px -30px rgba(0,0,0,.6); overflow: hidden; position: relative;
+  transform: rotate(3deg);
+}
+.phone .notch { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 90px; height: 22px; border-radius: 999px; background: var(--tinta); z-index: 3; }
+.phone .scr { border-radius: 32px; overflow: hidden; background: var(--crema); }
+.phone .scr img { aspect-ratio: 9/11; object-fit: cover; width: 100%; }
+.phone .scr .mini { padding: 16px; }
+.phone .scr .mini b { font-family: var(--f-display); font-size: 1rem; display: block; color: var(--tinta); }
+.phone .scr .mini span { font-size: .78rem; color: var(--tinta-60); }
+.phone .scr .mini .bar { height: 6px; border-radius: 99px; background: var(--crema-2); margin-top: 12px; overflow: hidden; }
+.phone .scr .mini .bar i { display: block; height: 100%; width: 64%; background: var(--coral); border-radius: 99px; }
+@media (max-width: 860px) { .app-flex { flex-direction: column; gap: 44px; } .phone { transform: rotate(0); } }
+
+/* ---------- testimonios ---------- */
+.tst { max-width: 780px; margin: 0 auto; text-align: center; }
+.tst blockquote { font-family: var(--f-display); font-size: clamp(1.4rem, 3vw, 2.1rem); font-weight: 600; line-height: 1.3; }
+.tst .who { margin-top: 22px; font-weight: 600; color: var(--tinta-60); }
+.tst .stars { color: var(--coral); letter-spacing: 4px; font-size: 1.1rem; margin-bottom: 18px; }
+
+/* ---------- cta instructor ---------- */
+.inst-cta { border-radius: calc(var(--r) * 1.4); background: var(--tinta); color: var(--crema); padding: clamp(40px, 6vw, 80px); display: flex; align-items: center; justify-content: space-between; gap: 40px; flex-wrap: wrap; position: relative; overflow: hidden; }
+.inst-cta::before { content: ''; position: absolute; right: -80px; top: -80px; width: 340px; height: 340px; border-radius: 50%; background: radial-gradient(circle, rgba(255,90,60,.35), transparent 70%); }
+.inst-cta h2 { font-size: clamp(1.8rem, 3.6vw, 2.8rem); max-width: 18ch; position: relative; }
+.inst-cta p { opacity: .8; max-width: 44ch; margin-top: 12px; position: relative; }
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <img class="bg" src="img/hero.jpg" alt="Mujer entrenando pilates en casa siguiendo una clase desde su celular">
+  <div class="hero-in">
+    <div class="eyebrow">Marketplace fitness</div>
+    <h1>Tu entrenador favorito, <em>en tu bolsillo.</em></h1>
+    <p class="sub">Programas de pilates, fuerza, funcional y nutrición creados por instructores reales. Regístrate en segundos, paga en línea y entrena desde cualquier dispositivo.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-coral" href="explorar.html">Explorar programas</a>
+      <a class="btn btn-ghost" href="panel-instructor.html" style="color:var(--crema)">Soy instructor</a>
+    </div>
+    <div class="hero-cats" id="heroCats"></div>
+  </div>
+</header>
+
+<!-- ================= MARQUEE ================= -->
+<div class="marq" aria-hidden="true">
+  <div class="marq-track" id="marq"></div>
+</div>
+
+<!-- ================= CATEGORÍAS ================= -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div>
+        <div class="kicker">Categorías</div>
+        <h2>Encuentra tu forma<br>de moverte</h2>
+      </div>
+      <p class="sec-sub">Cada categoría reúne programas de varios instructores. Explora, compara y elige el que va contigo.</p>
+    </div>
+    <div class="cats-grid" id="catsGrid"></div>
+  </div>
+</section>
+
+<!-- ================= INSTRUCTORES ================= -->
+<section class="sec sec-inst" id="instructores">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div>
+        <div class="kicker">Instructores</div>
+        <h2>Personas reales,<br>métodos probados</h2>
+      </div>
+      <p class="sec-sub">Cada instructor tiene su perfil público con su historia, sus programas y sus clases. Un enlace directo que puede compartir en su publicidad y redes.</p>
+    </div>
+    <div class="inst-rail" id="instRail"></div>
+  </div>
+</section>
+
+<!-- ================= PROGRAMAS DESTACADOS ================= -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div>
+        <div class="kicker">Programas destacados</div>
+        <h2>Los más queridos<br>de la comunidad</h2>
+      </div>
+      <a class="btn btn-tinta btn-sm" href="explorar.html">Ver todos</a>
+    </div>
+    <div class="grid g3" id="progGrid"></div>
+  </div>
+</section>
+
+<!-- ================= CÓMO FUNCIONA ================= -->
+<section class="sec" id="como" style="padding-top:40px">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div>
+        <div class="kicker">Cómo funciona</div>
+        <h2>Tan fácil que no<br>necesita manual</h2>
+      </div>
+    </div>
+    <div class="pasos rv">
+      <div class="paso">
+        <div class="num">1</div>
+        <h3>Regístrate en segundos</h3>
+        <p>Con tu cuenta de Google o con un código que llega a tu correo. Sin contraseñas, sin fricción, sin importar tu edad.</p>
+      </div>
+      <div class="paso">
+        <div class="num">2</div>
+        <h3>Paga en línea</h3>
+        <p>Tarjeta, PSE o Nequi. Tu acceso se activa automáticamente apenas se confirma el pago, con correo de bienvenida incluido.</p>
+      </div>
+      <div class="paso">
+        <div class="num">3</div>
+        <h3>Entrena donde quieras</h3>
+        <p>Celular, tablet, computador o televisor. Tus clases quedan organizadas por semanas y tu progreso se guarda solo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= APP / PWA ================= -->
+<section class="sec sec-app">
+  <div class="wrap app-flex">
+    <div class="app-txt rv">
+      <div class="kicker" style="color:var(--lila)">Como una app, sin tiendas</div>
+      <h2>Llévala en tu pantalla de inicio</h2>
+      <p>tono. es una web app: se comporta como una aplicación —con acceso directo en tu celular— pero sin descargas, sin actualizaciones y sin esperar aprobaciones de las tiendas.</p>
+      <p>Abres, entrenas y tu progreso te espera en cualquier dispositivo.</p>
+      <a class="btn btn-coral" href="explorar.html" style="margin-top:16px">Probar la experiencia</a>
+    </div>
+    <div class="phone rv">
+      <div class="notch"></div>
+      <div class="scr">
+        <img src="img/p-core21.jpg" alt="Clase de core en el celular">
+        <div class="mini">
+          <b>Core 21 Días</b>
+          <span>Clase 14 de 21 · Valentina Ríos</span>
+          <div class="bar"><i></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TESTIMONIO ================= -->
+<section class="sec">
+  <div class="wrap tst rv">
+    <div class="stars">★★★★★</div>
+    <blockquote>“Llevaba dos años pagando un gimnasio al que no iba. Ahora entreno cuatro veces por semana desde mi sala, con la instructora que seguía en redes.”</blockquote>
+    <div class="who">Mariana G. — alumna de Booty Camp</div>
+  </div>
+</section>
+
+<!-- ================= CTA INSTRUCTOR ================= -->
+<section class="sec" id="instructor-cta" style="padding-top:20px">
+  <div class="wrap">
+    <div class="inst-cta rv">
+      <div>
+        <h2>¿Enseñas? Tus clases pueden seguir vendiendo mientras duermes.</h2>
+        <p>Crea tu perfil, publica tus programas en video y recibe tus pagos centralizados en la plataforma. Nosotros ponemos la tecnología.</p>
+      </div>
+      <a class="btn btn-coral" href="panel-instructor.html">Conocer el panel del instructor</a>
+    </div>
+  </div>
+</section>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+montarUI({ navClara: true });
+
+// chips de categorías en el hero
+document.getElementById('heroCats').innerHTML =
+  CATS.map(c => `<a href="explorar.html?cat=${c.id}">${c.label}</a>`).join('');
+
+// marquee
+const items = ['+40 programas en video', '6 instructores verificados', 'Desde $49.900 COP', 'Pagos con tarjeta, PSE y Nequi', 'Entrena en cualquier dispositivo', 'Acceso inmediato'];
+document.getElementById('marq').innerHTML = items.concat(items).map(t => `<span><i>●</i>${t}</span>`).join('');
+
+// categorías
+document.getElementById('catsGrid').innerHTML = CATS.map(c => `
+  <a class="cat-tile rv" href="explorar.html?cat=${c.id}">
+    <img src="${c.img}" alt="${c.label}" loading="lazy"><span>${c.label}</span>
+  </a>`).join('');
+
+// instructores (6)
+document.getElementById('instRail').innerHTML = INSTRUCTORES.map(i => `
+  <a class="icard rv" href="instructor.html?i=${i.slug}">
+    <img src="${i.img}" alt="${i.nombre}" loading="lazy">
+    <div class="info">
+      <div class="rol">${i.rol}</div>
+      <h3>${i.nombre} ${i.verificada ? '<span class="check">✓</span>' : ''}</h3>
+      <div class="meta">${i.alumnos.toLocaleString('es-CO')} alumnos · ★ ${i.rating}</div>
+    </div>
+  </a>`).join('');
+
+// programas destacados
+document.getElementById('progGrid').innerHTML =
+  PROGRAMAS.filter(p => p.destacado).map(pcardHTML).join('');
+
+// re-observar reveals inyectados
+document.querySelectorAll('.rv:not(.in)').forEach(el => {
+  new IntersectionObserver((es, o) => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); o.unobserve(e.target); } }), { threshold: .1 }).observe(el);
+});
+</script>
+</body>
+</html>

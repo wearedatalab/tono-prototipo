@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Explorar programas — tono.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+.head { padding: calc(var(--nav-h) + 56px) 0 34px; }
+.head h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); font-weight: 800; margin-bottom: 12px; }
+.filtros { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 18px 0 30px; position: sticky; top: var(--nav-h); background: var(--crema); z-index: 40; }
+.filtros .sep { width: 1px; height: 26px; background: var(--linea); margin: 0 8px; }
+.buscar { display: flex; align-items: center; gap: 10px; border: 1.5px solid var(--linea); border-radius: 999px; padding: 9px 18px; background: var(--blanco); min-width: 220px; flex: 1; max-width: 340px; }
+.buscar input { border: none; outline: none; background: none; width: 100%; font-size: .95rem; }
+.filtros select { padding: 9px 16px; border-radius: 999px; border: 1.5px solid var(--linea); background: var(--blanco); font-weight: 600; font-size: .9rem; outline: none; }
+.cuenta { color: var(--tinta-60); font-size: .92rem; margin: 4px 0 22px; }
+.vacio { text-align: center; padding: 80px 20px; color: var(--tinta-60); }
+.vacio b { font-family: var(--f-display); font-size: 1.4rem; color: var(--tinta); display: block; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<div class="wrap head">
+  <div class="kicker">Marketplace</div>
+  <h1>Explorar programas</h1>
+  <p class="mut" style="max-width:52ch">Todos los programas de todos los instructores, en un solo lugar. Filtra por categoría o nivel y encuentra el tuyo.</p>
+</div>
+
+<div class="wrap">
+  <div class="filtros" id="filtros">
+    <div class="buscar">🔍 <input id="q" type="search" placeholder="Buscar programa o instructor…"></div>
+    <div class="sep"></div>
+    <button class="chip on" data-cat="">Todo</button>
+    <!-- chips categorías via JS -->
+    <div class="sep"></div>
+    <select id="nivel">
+      <option value="">Todos los niveles</option>
+      <option>Principiante</option>
+      <option>Intermedio</option>
+      <option>Avanzado</option>
+    </select>
+  </div>
+  <div class="cuenta" id="cuenta"></div>
+  <div class="grid g3" id="grid" style="padding-bottom:90px"></div>
+  <div class="vacio oculto" id="vacio">
+    <b>Nada por aquí</b>
+    Prueba con otra categoría u otro término de búsqueda.
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+montarUI({});
+
+const filtros = document.getElementById('filtros');
+const nivelSel = document.getElementById('nivel');
+const q = document.getElementById('q');
+let cat = param('cat') || '';
+
+// chips
+const sepEl = filtros.querySelectorAll('.sep')[1];
+CATS.forEach(c => {
+  const b = document.createElement('button');
+  b.className = 'chip' + (c.id === cat ? ' on' : '');
+  b.dataset.cat = c.id; b.textContent = c.label;
+  filtros.insertBefore(b, sepEl);
+});
+if (cat) filtros.querySelector('[data-cat=""]').classList.remove('on');
+
+filtros.addEventListener('click', e => {
+  const b = e.target.closest('.chip'); if (!b) return;
+  filtros.querySelectorAll('.chip').forEach(x => x.classList.remove('on'));
+  b.classList.add('on'); cat = b.dataset.cat; render();
+});
+nivelSel.addEventListener('change', render);
+q.addEventListener('input', render);
+
+function render() {
+  const term = q.value.trim().toLowerCase();
+  const nivel = nivelSel.value;
+  const res = PROGRAMAS.filter(p => {
+    const inst = findI(p.instructor);
+    if (cat && p.cat !== cat) return false;
+    if (nivel && p.nivel !== nivel) return false;
+    if (term && !(p.titulo + ' ' + inst.nombre).toLowerCase().includes(term)) return false;
+    return true;
+  });
+  document.getElementById('cuenta').textContent = res.length + ' programa' + (res.length !== 1 ? 's' : '') + (cat ? ' en ' + catLabel(cat) : '');
+  document.getElementById('grid').innerHTML = res.map(pcardHTML).join('');
+  document.getElementById('vacio').classList.toggle('oculto', res.length > 0);
+  document.querySelectorAll('.rv:not(.in)').forEach(el => el.classList.add('in'));
+}
+render();
+</script>
+</body>
+</html>

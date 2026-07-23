@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Back office — tono.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+body { background: #191220; color: #EFE9F4; }
+.shell { display: grid; grid-template-columns: 250px 1fr; min-height: 100svh; }
+@media (max-width: 900px) { .shell { grid-template-columns: 1fr; } .side { position: static !important; height: auto !important; flex-direction: row !important; overflow-x: auto; padding: 14px !important; } .side .rolbox, .side .abajo { display: none !important; } }
+.side { background: #120C18; padding: 26px 18px; display: flex; flex-direction: column; gap: 4px; position: sticky; top: 0; height: 100svh; }
+.side .logo { font-size: 1.5rem; margin: 0 10px 6px; color: #EFE9F4; }
+.side .rolbox { margin: 0 10px 20px; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--lila); font-weight: 700; }
+.stab { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; background: none; border: none; color: #EFE9F4; font-size: .95rem; font-weight: 600; opacity: .65; transition: all .15s; text-align: left; white-space: nowrap; }
+.stab:hover { opacity: 1; background: rgba(239,233,244,.06); }
+.stab.on { opacity: 1; background: var(--coral); }
+.side .abajo { margin-top: auto; font-size: .78rem; opacity: .45; padding: 0 10px; }
+.main { padding: clamp(22px, 4vw, 44px); }
+.main h1 { font-size: clamp(1.6rem, 3.2vw, 2.3rem); font-weight: 800; margin-bottom: 4px; }
+.main .sub { color: rgba(239,233,244,.55); margin-bottom: 30px; font-size: .95rem; }
+.vista { display: none; }
+.vista.on { display: block; animation: fade .3s ease; }
+@keyframes fade { from { opacity: 0; transform: translateY(8px); } }
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 26px; }
+@media (max-width: 1100px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+.kpi { background: #221930; border-radius: 14px; padding: 20px 22px; border: 1px solid rgba(239,233,244,.08); }
+.kpi .l { font-size: .8rem; font-weight: 600; color: rgba(239,233,244,.55); }
+.kpi b { font-family: var(--f-display); font-size: 1.7rem; font-weight: 800; display: block; margin-top: 4px; }
+.kpi .delta { font-size: .78rem; font-weight: 700; color: #6FD3A0; }
+.bloque { background: #221930; border: 1px solid rgba(239,233,244,.08); border-radius: 14px; padding: 24px; margin-bottom: 22px; }
+.bloque h3 { font-size: 1.05rem; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.bloque h3 small { font-weight: 500; color: rgba(239,233,244,.5); font-size: .8rem; }
+.chart { display: flex; align-items: flex-end; gap: 12px; height: 190px; }
+.chart .col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end; }
+.chart .bar { width: 100%; max-width: 46px; border-radius: 8px 8px 0 0; background: #4A3560; transition: height .8s cubic-bezier(.2,.7,.2,1); }
+.chart .col:last-child .bar { background: var(--coral); }
+.chart .m { font-size: .72rem; color: rgba(239,233,244,.5); font-weight: 600; }
+.chart .v { font-size: .7rem; font-weight: 700; }
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+th { text-align: left; font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: rgba(239,233,244,.5); padding: 10px 12px; border-bottom: 1.5px solid rgba(239,233,244,.1); }
+td { padding: 12px; border-bottom: 1px solid rgba(239,233,244,.07); }
+tr:last-child td { border-bottom: none; }
+.pill { font-size: .72rem; font-weight: 700; padding: 4px 12px; border-radius: 999px; white-space: nowrap; }
+.pill.admin { background: rgba(201,184,236,.16); color: var(--lila); }
+.pill.inst { background: rgba(255,90,60,.16); color: #FF8A73; }
+.pill.alum { background: rgba(111,211,160,.14); color: #6FD3A0; }
+.pill.ok { background: rgba(111,211,160,.14); color: #6FD3A0; }
+.pill.pend { background: rgba(255,196,87,.15); color: #FFC457; }
+.btn-mini { background: rgba(239,233,244,.08); border: 1px solid rgba(239,233,244,.14); color: #EFE9F4; font-size: .8rem; font-weight: 600; padding: 7px 14px; border-radius: 999px; cursor: pointer; transition: all .15s; white-space: nowrap; }
+.btn-mini:hover { background: rgba(239,233,244,.16); }
+.btn-mini.coral { background: var(--coral); border-color: var(--coral); color: #fff; }
+/* logs */
+.log { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(239,233,244,.06); font-size: .87rem; font-family: ui-monospace, monospace; }
+.log .h { color: rgba(239,233,244,.4); white-space: nowrap; }
+.log .tipo { font-weight: 700; }
+.log .tipo.v { color: #6FD3A0; } .log .tipo.u { color: var(--lila); } .log .tipo.s { color: #FFC457; }
+/* plantillas correo */
+.mailgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+@media (max-width: 1100px) { .mailgrid { grid-template-columns: 1fr; } }
+.mailtpl { border: 1px solid rgba(239,233,244,.1); border-radius: 14px; overflow: hidden; background: #191220; }
+.mailtpl .mh { padding: 12px 16px; font-size: .78rem; color: rgba(239,233,244,.55); border-bottom: 1px solid rgba(239,233,244,.08); display: flex; justify-content: space-between; align-items: center; }
+.mailtpl .cuerpo { padding: 20px; background: var(--crema); color: var(--tinta); font-size: .85rem; }
+.mailtpl .cuerpo .logo { font-size: 1.2rem; margin-bottom: 10px; }
+.mailtpl .cuerpo b { display: block; font-family: var(--f-display); font-size: 1.02rem; margin-bottom: 6px; }
+.mailtpl .cuerpo .cta { display: inline-block; background: var(--coral); color: #fff; font-weight: 700; font-size: .8rem; padding: 8px 18px; border-radius: 999px; margin-top: 12px; }
+/* contenidos */
+.f2c { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+@media (max-width: 700px) { .f2c { grid-template-columns: 1fr; } }
+.field label { color: rgba(239,233,244,.6); }
+.field input, .field select, .field textarea { background: #191220; border-color: rgba(239,233,244,.15); color: #EFE9F4; }
+.cat-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(239,233,244,.07); }
+.cat-row .drag { color: rgba(239,233,244,.3); cursor: grab; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="side">
+    <a class="logo" href="index.html">tono<i>.</i></a>
+    <div class="rolbox">Superadministrador</div>
+    <button class="stab on" data-v="resumen">📈 Resumen</button>
+    <button class="stab" data-v="usuarios">👥 Usuarios y roles</button>
+    <button class="stab" data-v="instructores">🧑‍🏫 Instructores</button>
+    <button class="stab" data-v="contenidos">🎨 Contenidos</button>
+    <button class="stab" data-v="notifs">✉️ Notificaciones</button>
+    <button class="stab" data-v="logs">🧾 Logs</button>
+    <div class="abajo">Back office demo · multiusuario y multirol<br>(superadmin · instructor · alumno)</div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ===== RESUMEN ===== -->
+    <section class="vista on" id="v-resumen">
+      <h1>Resumen de la plataforma</h1>
+      <p class="sub">Ventas, usuarios y actividad. Corte: hoy 23 de julio, 10:40 a. m.</p>
+      <div class="kpis">
+        <div class="kpi"><span class="l">Ventas del mes (GMV)</span><b>$18.4M</b><span class="delta">▲ 16% vs. junio</span></div>
+        <div class="kpi"><span class="l">Transacciones</span><b>172</b><span class="delta">▲ 21</span></div>
+        <div class="kpi"><span class="l">Usuarios registrados</span><b>5.847</b><span class="delta">▲ 214 este mes</span></div>
+        <div class="kpi"><span class="l">Tasa de conversión</span><b>4.7%</b><span class="delta">▲ 0.6 pts</span></div>
+      </div>
+      <div class="bloque">
+        <h3>Ventas por mes <small>últimos 6 meses · millones COP</small></h3>
+        <div class="chart" id="chartAdmin"></div>
+      </div>
+      <div class="bloque">
+        <h3>Programas más vendidos <small>este mes</small></h3>
+        <table>
+          <thead><tr><th>#</th><th>Programa</th><th>Instructor</th><th>Ventas</th><th>Ingresos</th></tr></thead>
+          <tbody id="topProgs"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== USUARIOS ===== -->
+    <section class="vista" id="v-usuarios">
+      <h1>Usuarios y roles</h1>
+      <p class="sub">Gestión multiusuario con roles diferenciados. Con «Ingresar como» ves la plataforma exactamente como la ve esa persona — ideal para dar soporte.</p>
+      <div class="bloque">
+        <table>
+          <thead><tr><th>Usuario</th><th>Correo</th><th>Rol</th><th>Registro</th><th>Estado</th><th></th></tr></thead>
+          <tbody id="usersBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== INSTRUCTORES ===== -->
+    <section class="vista" id="v-instructores">
+      <h1>Instructores</h1>
+      <p class="sub">Aprobación, verificación y desempeño de los instructores del marketplace.</p>
+      <div class="bloque">
+        <table>
+          <thead><tr><th>Instructor</th><th>Especialidad</th><th>Programas</th><th>Alumnos</th><th>Ventas mes</th><th>Estado</th><th></th></tr></thead>
+          <tbody id="instsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== CONTENIDOS ===== -->
+    <section class="vista" id="v-contenidos">
+      <h1>Contenidos del sitio</h1>
+      <p class="sub">Textos, banners y categorías editables sin depender de un desarrollador.</p>
+      <div class="bloque">
+        <h3>Textos de la portada</h3>
+        <div class="f2c">
+          <div class="field"><label>Titular del hero</label><input value="Tu entrenador favorito, en tu bolsillo."></div>
+          <div class="field"><label>Subtítulo</label><input value="Programas de pilates, fuerza, funcional y nutrición creados por instructores reales."></div>
+        </div>
+        <button class="btn-mini coral" style="margin-top:16px" onclick="toast('✓ Cambios guardados (demo) — se publican al instante')">Guardar cambios</button>
+      </div>
+      <div class="bloque">
+        <h3>Categorías <small>arrastra para reordenar (demo)</small></h3>
+        <div id="catsAdmin"></div>
+        <button class="btn-mini" style="margin-top:14px" onclick="toast('En la plataforma real aquí agregas una categoría nueva')">＋ Nueva categoría</button>
+      </div>
+      <div class="bloque">
+        <h3>Datos de contacto</h3>
+        <div class="f2c">
+          <div class="field"><label>WhatsApp de soporte</label><input value="+57 310 000 0000"></div>
+          <div class="field"><label>Correo de contacto</label><input value="hola@tono.fit"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== NOTIFICACIONES ===== -->
+    <section class="vista" id="v-notifs">
+      <h1>Motor de notificaciones</h1>
+      <p class="sub">Plantillas de los correos automáticos. Se disparan solas: bienvenida al registrarse, confirmación al comprar y aviso al instructor con cada venta.</p>
+      <div class="mailgrid">
+        <div class="mailtpl">
+          <div class="mh"><span>Al usuario · al registrarse</span><span class="pill ok">Activa</span></div>
+          <div class="cuerpo">
+            <div class="logo">tono<i style="color:var(--coral)">.</i></div>
+            <b>¡Bienvenida, {nombre}! 👋</b>
+            Tu cuenta quedó lista. Explora los programas, guarda tus favoritos y empieza hoy tu primera clase.
+            <span class="cta">Explorar programas</span>
+          </div>
+        </div>
+        <div class="mailtpl">
+          <div class="mh"><span>Al usuario · al comprar</span><span class="pill ok">Activa</span></div>
+          <div class="cuerpo">
+            <div class="logo">tono<i style="color:var(--coral)">.</i></div>
+            <b>Tu acceso está activo ✓</b>
+            Compraste {programa} de {instructor}. Ya puedes entrenar desde cualquier dispositivo, cuando quieras.
+            <span class="cta">Empezar a entrenar</span>
+          </div>
+        </div>
+        <div class="mailtpl">
+          <div class="mh"><span>Al instructor · nueva venta</span><span class="pill ok">Activa</span></div>
+          <div class="cuerpo">
+            <div class="logo">tono<i style="color:var(--coral)">.</i></div>
+            <b>¡Nueva venta! 🎉</b>
+            {alumno} acaba de comprar {programa} por {valor}. Tu saldo del mes ya se actualizó en el panel.
+            <span class="cta">Ver mis ventas</span>
+          </div>
+        </div>
+      </div>
+      <div class="bloque" style="margin-top:22px">
+        <h3>Canales <small>correo incluido · WhatsApp/SMS se cotizan por separado</small></h3>
+        <table>
+          <tbody>
+            <tr><td>✉️ Correo electrónico</td><td><span class="pill ok">Incluido</span></td></tr>
+            <tr><td>🔔 Notificaciones del navegador</td><td><span class="pill ok">Incluido</span></td></tr>
+            <tr><td>📱 WhatsApp / SMS</td><td><span class="pill pend">Opcional · vía terceros</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== LOGS ===== -->
+    <section class="vista" id="v-logs">
+      <h1>Registros de actividad</h1>
+      <p class="sub">Trazabilidad completa: quién hizo qué y cuándo. Filtra por tipo de evento.</p>
+      <div class="bloque">
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+          <button class="btn-mini coral" data-f="">Todos</button>
+          <button class="btn-mini" data-f="v">Ventas</button>
+          <button class="btn-mini" data-f="u">Usuarios</button>
+          <button class="btn-mini" data-f="s">Sistema</button>
+        </div>
+        <div id="logsBody"></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="admin.js"></script>
+
+</body>
+</html>

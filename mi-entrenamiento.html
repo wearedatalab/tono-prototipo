@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi entrenamiento — tono.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+.mihead { padding: calc(var(--nav-h) + 54px) 0 40px; display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+.mihead h1 { font-size: clamp(2rem, 4.6vw, 3.2rem); font-weight: 800; }
+.mihead .sub { color: var(--tinta-60); margin-top: 6px; }
+.salir { background: none; border: none; color: var(--tinta-60); font-weight: 600; font-size: .9rem; text-decoration: underline; }
+/* continuar */
+.continuar { border-radius: var(--r); overflow: hidden; background: var(--ciruela); color: var(--crema); display: grid; grid-template-columns: 1fr 1fr; box-shadow: var(--sombra); }
+.continuar .img { position: relative; min-height: 260px; }
+.continuar .img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.continuar .txt { padding: clamp(26px, 4vw, 48px); display: flex; flex-direction: column; justify-content: center; gap: 12px; }
+.continuar .txt .k { font-size: .78rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--lila); }
+.continuar .txt h2 { font-size: clamp(1.5rem, 3vw, 2.2rem); }
+.anillo { display: flex; align-items: center; gap: 16px; margin: 6px 0 10px; }
+.anillo svg { transform: rotate(-90deg); }
+.anillo .pct { font-family: var(--f-display); font-weight: 800; font-size: 1.05rem; }
+.anillo small { opacity: .7; display: block; font-size: .8rem; }
+@media (max-width: 860px) { .continuar { grid-template-columns: 1fr; } }
+/* racha */
+.racha { display: flex; gap: 12px; align-items: center; margin-top: 34px; flex-wrap: wrap; }
+.racha .dias { display: flex; gap: 8px; }
+.racha .d { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-size: .78rem; font-weight: 700; border: 1.5px solid var(--linea); color: var(--tinta-60); }
+.racha .d.on { background: var(--coral); border-color: var(--coral); color: #fff; }
+.racha b { font-family: var(--f-display); }
+/* notifs */
+.notif { display: flex; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--linea); }
+.notif .ic { width: 42px; height: 42px; border-radius: 50%; background: var(--crema-2); display: grid; place-items: center; flex-shrink: 0; }
+.notif b { display: block; font-size: .97rem; }
+.notif p { color: var(--tinta-60); font-size: .9rem; }
+.notif .cuando { margin-left: auto; font-size: .78rem; color: var(--tinta-30); white-space: nowrap; }
+.vacio-mini { padding: 26px; border: 1.5px dashed var(--linea); border-radius: var(--r-sm); text-align: center; color: var(--tinta-60); }
+</style>
+</head>
+<body>
+
+<div class="wrap mihead">
+  <div>
+    <div class="kicker">Mi entrenamiento</div>
+    <h1 id="saludo"></h1>
+    <div class="sub" id="subSaludo"></div>
+  </div>
+  <button class="salir" onclick="TONO.logout();location.href='index.html'">Cerrar sesión</button>
+</div>
+
+<div class="wrap" id="zonaContinuar"></div>
+
+<div class="wrap">
+  <div class="racha" id="racha"></div>
+</div>
+
+<section class="sec" style="padding:70px 0 50px">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="kicker">Biblioteca</div>
+        <h2>Mis programas</h2>
+      </div>
+      <a class="btn btn-tinta btn-sm" href="explorar.html">Explorar más</a>
+    </div>
+    <div class="grid g3" id="misProgs"></div>
+    <div class="vacio-mini oculto" id="sinProgs">
+      Aún no tienes programas. <a href="explorar.html" style="color:var(--coral);font-weight:600">Explora el marketplace →</a>
+    </div>
+  </div>
+</section>
+
+<section class="sec" style="padding:20px 0 90px">
+  <div class="wrap" style="max-width:760px;margin-left:0">
+    <div class="sec-head">
+      <div>
+        <div class="kicker">Notificaciones</div>
+        <h2 style="font-size:1.8rem">Tu actividad</h2>
+      </div>
+    </div>
+    <div id="notifs"></div>
+  </div>
+</section>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+if (!TONO.user) location.href = 'acceso.html';
+montarUI({});
+
+const u = TONO.user;
+const hora = new Date().getHours();
+const saludoTxt = hora < 12 ? 'Buenos días' : hora < 19 ? 'Buenas tardes' : 'Buenas noches';
+document.getElementById('saludo').textContent = saludoTxt + ', ' + u.nombre.split(' ')[0];
+
+const compras = TONO.compras.map(findP).filter(Boolean);
+document.getElementById('subSaludo').textContent = compras.length
+  ? 'Tienes ' + compras.length + ' programa' + (compras.length > 1 ? 's' : '') + ' activo' + (compras.length > 1 ? 's' : '') + '. Hoy es buen día para moverse.'
+  : 'Tu cuenta está lista. Elige tu primer programa y arranca hoy.';
+
+// continuar entrenando: el programa con progreso más reciente (o el primero comprado)
+function pct(slug) {
+  const p = findP(slug);
+  const total = leccionesDe(p).flatMap(s => s.lecciones).length;
+  return Math.round(TONO.progreso(slug).length / total * 100);
+}
+if (compras.length) {
+  const enCurso = compras.slice().sort((a, b) => pct(b.slug) - pct(a.slug))[0];
+  const pc = pct(enCurso.slug);
+  const inst = findI(enCurso.instructor);
+  const C = 2 * Math.PI * 26;
+  document.getElementById('zonaContinuar').innerHTML = `
+    <div class="continuar">
+      <div class="img"><img src="${enCurso.img}" alt=""></div>
+      <div class="txt">
+        <span class="k">Continuar entrenando</span>
+        <h2>${enCurso.titulo}</h2>
+        <span style="opacity:.75;font-size:.92rem">con ${inst.nombre}</span>
+        <div class="anillo">
+          <svg width="60" height="60"><circle cx="30" cy="30" r="26" fill="none" stroke="rgba(246,241,233,.15)" stroke-width="6"/><circle cx="30" cy="30" r="26" fill="none" stroke="#FF5A3C" stroke-width="6" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pc / 100)}"/></svg>
+          <div><span class="pct">${pc}% completado</span><small>Tu progreso se guarda en todos tus dispositivos</small></div>
+        </div>
+        <a class="btn btn-coral" style="align-self:flex-start" href="clase.html?p=${enCurso.slug}">Entrenar ahora</a>
+      </div>
+    </div>`;
+}
+
+// racha semanal demo (días con actividad según progreso)
+const diasSem = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+const hoy = (new Date().getDay() + 6) % 7;
+const activos = compras.length ? [Math.max(0, hoy - 2), Math.max(0, hoy - 1), hoy].filter((v, i, a) => a.indexOf(v) === i) : [];
+document.getElementById('racha').innerHTML = `
+  <div class="dias">${diasSem.map((d, i) => `<span class="d ${activos.includes(i) ? 'on' : ''}">${d}</span>`).join('')}</div>
+  <span>${activos.length ? '<b>Racha de ' + activos.length + ' día' + (activos.length > 1 ? 's' : '') + '</b> — no la rompas 🔥' : 'Entrena hoy y arranca tu racha 🔥'}</span>`;
+
+// mis programas
+if (compras.length) {
+  document.getElementById('misProgs').innerHTML = compras.map(p => {
+    const inst = findI(p.instructor);
+    const pc = pct(p.slug);
+    return `
+    <a class="pcard" href="clase.html?p=${p.slug}">
+      <div class="ph"><img src="${p.img}" alt=""><span class="tag">${pc}%</span></div>
+      <div class="pc-body">
+        <h3>${p.titulo}</h3>
+        <div class="pc-inst"><img src="${inst.img}" alt="">${inst.nombre}</div>
+        <div class="pc-foot">
+          <span style="font-weight:700;color:var(--coral)">Continuar →</span>
+          <span class="rating mut">${TONO.progreso(p.slug).length}/${leccionesDe(p).flatMap(s=>s.lecciones).length} clases</span>
+        </div>
+      </div>
+    </a>`;
+  }).join('');
+} else {
+  document.getElementById('sinProgs').classList.remove('oculto');
+}
+
+// notificaciones
+const ns = TONO.notifs;
+document.getElementById('notifs').innerHTML = ns.length
+  ? ns.map(n => `
+    <div class="notif">
+      <span class="ic">🔔</span>
+      <div><b>${n.titulo}</b><p>${n.cuerpo}</p></div>
+      <span class="cuando">${n.fecha}</span>
+    </div>`).join('')
+  : '<div class="vacio-mini">Sin notificaciones todavía. Aquí verás tus compras, logros y novedades de tus instructores.</div>';
+</script>
+</body>
+</html>

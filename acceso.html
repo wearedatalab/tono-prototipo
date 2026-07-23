@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ingresar — tono.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+body { min-height: 100svh; display: flex; }
+.lado {
+  flex: 1; position: relative; overflow: hidden; display: none;
+}
+.lado img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.lado::after { content: ''; position: absolute; inset: 0; background: linear-gradient(20deg, rgba(36,27,43,.7), rgba(36,27,43,.1)); }
+.lado .frase { position: absolute; bottom: 48px; left: 48px; right: 48px; z-index: 2; color: var(--crema); }
+.lado .frase b { font-family: var(--f-display); font-size: 1.9rem; font-weight: 700; line-height: 1.2; display: block; max-width: 18ch; }
+.lado .frase span { opacity: .8; font-size: .95rem; }
+@media (min-width: 960px) { .lado { display: block; } }
+
+.panel { width: min(560px, 100%); margin: 0 auto; display: flex; flex-direction: column; padding: 34px clamp(24px, 6vw, 70px); }
+.panel .logo { font-size: 2rem; }
+.panel-c { margin: auto 0; padding: 60px 0; }
+.panel h1 { font-size: clamp(1.9rem, 4vw, 2.6rem); font-weight: 800; margin-bottom: 10px; }
+.panel .sub { color: var(--tinta-60); margin-bottom: 34px; }
+.g-btn {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 12px;
+  padding: 15px; border-radius: 999px; border: 1.5px solid var(--linea); background: var(--blanco);
+  font-weight: 600; font-size: 1rem; transition: all .16s ease;
+}
+.g-btn:hover { border-color: var(--tinta); transform: translateY(-1px); }
+.g-btn .gi { font-weight: 800; background: linear-gradient(90deg,#4285F4,#EA4335,#FBBC05,#34A853); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 1.2rem; }
+.o { display: flex; align-items: center; gap: 16px; color: var(--tinta-30); font-size: .85rem; font-weight: 600; margin: 26px 0; }
+.o::before, .o::after { content: ''; flex: 1; height: 1px; background: var(--linea); }
+.magic-note { font-size: .85rem; color: var(--tinta-60); margin-top: 12px; display: flex; gap: 8px; }
+.paso2, .paso3 { display: none; }
+/* correo simulado */
+.inbox { border: 1.5px solid var(--linea); border-radius: var(--r-sm); background: var(--blanco); overflow: hidden; margin: 22px 0; box-shadow: var(--sombra); }
+.inbox .ih { background: var(--crema-2); padding: 10px 18px; font-size: .8rem; font-weight: 600; color: var(--tinta-60); display: flex; gap: 8px; align-items: center; }
+.inbox .ib { padding: 20px; }
+.inbox .ib .de { font-size: .85rem; color: var(--tinta-60); margin-bottom: 10px; }
+.inbox .codigo { font-family: var(--f-display); font-size: 2.2rem; font-weight: 800; letter-spacing: .18em; color: var(--coral); }
+.cod-inputs { display: flex; gap: 10px; margin: 20px 0; }
+.cod-inputs input { width: 54px; height: 62px; text-align: center; font-size: 1.5rem; font-weight: 700; border: 1.5px solid var(--linea); border-radius: var(--r-sm); background: var(--blanco); outline: none; }
+.cod-inputs input:focus { border-color: var(--coral); }
+.exito { text-align: center; padding: 30px 0; }
+.exito .checkbig { width: 90px; height: 90px; border-radius: 50%; background: var(--ok); color: #fff; display: grid; place-items: center; font-size: 2.4rem; margin: 0 auto 24px; animation: pop .5s cubic-bezier(.2,1.6,.4,1); }
+@keyframes pop { from { transform: scale(0); } }
+</style>
+</head>
+<body>
+
+<div class="lado">
+  <img src="img/hero.jpg" alt="">
+  <div class="frase">
+    <b>“Me registré en el tiempo que tarda un anuncio de YouTube.”</b>
+    <span>— Alejandra M., alumna de Movilidad Total</span>
+  </div>
+</div>
+
+<div class="panel">
+  <a class="logo" href="index.html">tono<i>.</i></a>
+
+  <div class="panel-c">
+    <!-- PASO 1: elegir método -->
+    <div class="paso1" id="paso1">
+      <h1>Entra en segundos</h1>
+      <p class="sub">Sin contraseñas que olvidar. Elige cómo quieres entrar y sigue entrenando.</p>
+      <button class="g-btn" onclick="loginGoogle()"><span class="gi">G</span> Continuar con Google</button>
+      <div class="o">o con tu correo</div>
+      <div class="field">
+        <label for="email">Correo electrónico</label>
+        <input type="email" id="email" placeholder="tunombre@correo.com" value="daniela@correo.com">
+      </div>
+      <button class="btn btn-coral" style="width:100%;margin-top:18px" onclick="enviarMagic()">Enviarme el código mágico</button>
+      <div class="magic-note">✨ <span>Te llega un código único a tu correo. Lo escribes y listo: adentro. Ideal para cualquier edad.</span></div>
+    </div>
+
+    <!-- PASO 2: código mágico -->
+    <div class="paso2" id="paso2">
+      <h1>Revisa tu correo</h1>
+      <p class="sub">Enviamos un código de acceso a <b id="emailDest"></b>. En este prototipo, el correo aparece aquí mismo:</p>
+      <div class="inbox">
+        <div class="ih">📧 Bandeja de entrada (simulada)</div>
+        <div class="ib">
+          <div class="de"><b>tono.</b> &lt;hola@tono.fit&gt; — Tu código de acceso</div>
+          <div class="codigo" id="codigoMostrado">····</div>
+        </div>
+      </div>
+      <div class="cod-inputs" id="codInputs">
+        <input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric">
+      </div>
+      <button class="btn btn-coral" style="width:100%" onclick="autocompletar()">Usar el código del correo</button>
+      <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:10px" onclick="volver()">Cambiar correo</button>
+    </div>
+
+    <!-- PASO 3: éxito -->
+    <div class="paso3" id="paso3">
+      <div class="exito">
+        <div class="checkbig">✓</div>
+        <h1>¡Hola, <span id="nombreOk"></span>!</h1>
+        <p class="sub">Tu cuenta quedó lista. Te enviamos un correo de bienvenida con los primeros pasos.</p>
+        <a class="btn btn-coral" style="width:100%" id="continuarBtn" href="mi-entrenamiento.html">Continuar</a>
+      </div>
+    </div>
+  </div>
+
+  <p style="font-size:.8rem;color:var(--tinta-30)">Prototipo navegable · no se guarda información real · DataLab</p>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+const next = param('next') || 'mi-entrenamiento.html';
+let codigo = '';
+
+function mostrar(n) {
+  ['paso1', 'paso2', 'paso3'].forEach((id, i) =>
+    document.getElementById(id).style.display = (i === n - 1) ? 'block' : 'none');
+}
+
+function nombreDesde(email) {
+  const base = email.split('@')[0].replace(/[._-]+/g, ' ').trim() || 'Daniela';
+  return base.split(' ').map(w => w[0].toUpperCase() + w.slice(1)).join(' ');
+}
+
+function finalizar(nombre, email) {
+  TONO.login({ nombre, email });
+  TONO.notificar('¡Bienvenida a tono.! 🎉', 'Tu cuenta quedó lista. Explora los programas y empieza a entrenar hoy.');
+  document.getElementById('nombreOk').textContent = nombre.split(' ')[0];
+  document.getElementById('continuarBtn').href = next;
+  mostrar(3);
+}
+
+function loginGoogle() {
+  toast('Conectando con Google… (simulado)');
+  setTimeout(() => finalizar('Daniela Torres', 'daniela@gmail.com'), 900);
+}
+
+function enviarMagic() {
+  const email = document.getElementById('email').value.trim();
+  if (!email.includes('@')) { toast('Escribe un correo válido'); return; }
+  codigo = String(Math.floor(1000 + Math.random() * 9000));
+  document.getElementById('emailDest').textContent = email;
+  document.getElementById('codigoMostrado').textContent = codigo.split('').join(' ');
+  mostrar(2);
+}
+
+function autocompletar() {
+  const inputs = document.querySelectorAll('#codInputs input');
+  inputs.forEach((inp, i) => setTimeout(() => {
+    inp.value = codigo[i];
+    if (i === 3) setTimeout(() => finalizar(nombreDesde(document.getElementById('email').value), document.getElementById('email').value), 350);
+  }, i * 140));
+}
+
+function volver() { mostrar(1); }
+
+// código manual también funciona
+document.getElementById('codInputs').addEventListener('input', (e) => {
+  const inputs = [...document.querySelectorAll('#codInputs input')];
+  const idx = inputs.indexOf(e.target);
+  if (e.target.value && idx < 3) inputs[idx + 1].focus();
+  if (inputs.every(i => i.value) && inputs.map(i => i.value).join('') === codigo) {
+    finalizar(nombreDesde(document.getElementById('email').value), document.getElementById('email').value);
+  }
+});
+
+// si ya hay sesión, saltar
+if (TONO.user) location.href = next;
+</script>
+</body>
+</html>

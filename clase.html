@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrenando — tono.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+body { background: var(--ciruela-d); color: var(--crema); }
+.player-page { padding: calc(var(--nav-h) + 30px) 0 80px; }
+.pp-grid { display: grid; grid-template-columns: 1fr 380px; gap: 30px; align-items: start; }
+@media (max-width: 1020px) { .pp-grid { grid-template-columns: 1fr; } }
+.video-zona { position: sticky; top: calc(var(--nav-h) + 20px); }
+.pantalla { aspect-ratio: 16/9; border-radius: var(--r); overflow: hidden; position: relative; background: #000; box-shadow: 0 30px 80px -20px rgba(0,0,0,.6); }
+.pantalla img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .8; transition: opacity .3s; }
+.pantalla.playing img { opacity: .5; }
+.pantalla .play-c { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 2; background: none; border: none; }
+.pantalla .play-c .pbtn { width: 88px; height: 88px; border-radius: 50%; background: var(--coral); color: #fff; display: grid; place-items: center; font-size: 1.8rem; transition: transform .2s; box-shadow: 0 16px 44px -8px rgba(255,90,60,.7); }
+.pantalla .play-c:hover .pbtn { transform: scale(1.08); }
+.pantalla .vim { position: absolute; z-index: 2; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center; color: var(--crema); display: none; padding: 20px; }
+.pantalla.playing .vim { display: block; }
+.pantalla.playing .play-c { display: none; }
+.pantalla .barra { position: absolute; bottom: 0; left: 0; right: 0; height: 6px; background: rgba(255,255,255,.15); z-index: 3; }
+.pantalla .barra i { display: block; height: 100%; width: 0; background: var(--coral); transition: width .4s linear; }
+.bajo-video { display: flex; align-items: center; gap: 14px; margin-top: 20px; flex-wrap: wrap; }
+.bajo-video h1 { font-size: clamp(1.3rem, 3vw, 1.9rem); flex: 1; min-width: 200px; }
+.material-chip { display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 999px; border: 1.5px solid rgba(246,241,233,.25); font-size: .88rem; font-weight: 600; color: var(--crema); background: none; }
+.material-chip .pdf { background: var(--coral); color: #fff; font-size: .65rem; font-weight: 800; padding: 4px 7px; border-radius: 5px; }
+.material-chip:hover { border-color: var(--crema); }
+/* lista lecciones */
+.lista { background: rgba(246,241,233,.05); border: 1px solid rgba(246,241,233,.1); border-radius: var(--r); overflow: hidden; }
+.lista .lh { padding: 20px 22px; border-bottom: 1px solid rgba(246,241,233,.1); }
+.lista .lh b { font-family: var(--f-display); font-size: 1.15rem; display: block; }
+.lista .lh span { font-size: .85rem; opacity: .65; }
+.lista .prog-bar { height: 6px; border-radius: 99px; background: rgba(246,241,233,.12); margin-top: 12px; overflow: hidden; }
+.lista .prog-bar i { display: block; height: 100%; background: var(--ok); border-radius: 99px; transition: width .5s ease; }
+.lista .cuerpo { max-height: 56vh; overflow-y: auto; }
+.lista .sem-t { padding: 14px 22px 6px; font-size: .75rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; opacity: .5; }
+.llec { width: 100%; text-align: left; display: flex; align-items: center; gap: 12px; padding: 12px 22px; background: none; border: none; color: var(--crema); font-size: .92rem; transition: background .15s; }
+.llec:hover { background: rgba(246,241,233,.06); }
+.llec.actual { background: rgba(255,90,60,.14); box-shadow: inset 3px 0 0 var(--coral); }
+.llec .est { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: .7rem; flex-shrink: 0; border: 1.5px solid rgba(246,241,233,.3); }
+.llec.hecha .est { background: var(--ok); border-color: var(--ok); }
+.llec .dur { margin-left: auto; opacity: .55; font-size: .8rem; }
+.acciones-clase { display: flex; gap: 12px; margin-top: 22px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<section class="player-page">
+  <div class="wrap pp-grid">
+    <div class="video-zona">
+      <div class="pantalla" id="pantalla">
+        <img id="poster" src="" alt="">
+        <button class="play-c" onclick="reproducir()"><span class="pbtn">▶</span></button>
+        <div class="vim">
+          <div style="font-family:var(--f-display);font-weight:800;font-size:1.2rem;margin-bottom:6px">▶ Reproduciendo (simulado)</div>
+          <p style="opacity:.75;font-size:.9rem;max-width:44ch;margin:0 auto">En la plataforma real este es el video embebido desde Vimeo/YouTube, sin publicidad. El prototipo simula la reproducción.</p>
+        </div>
+        <div class="barra"><i id="vprog"></i></div>
+      </div>
+      <div class="bajo-video">
+        <h1 id="tituloClase"></h1>
+        <button class="material-chip" onclick="toast('En la plataforma real aquí se descarga el PDF complementario')"><span class="pdf">PDF</span> <span id="matNombre">Material</span></button>
+      </div>
+      <div class="acciones-clase">
+        <button class="btn btn-coral" id="btnCompletar" onclick="completar()">✓ Marcar completada y seguir</button>
+        <a class="btn btn-ghost btn-sm" style="color:var(--crema);align-self:center" id="verPrograma" href="#">Ver programa</a>
+      </div>
+    </div>
+
+    <aside class="lista">
+      <div class="lh">
+        <b id="pTitulo"></b>
+        <span id="pMeta"></span>
+        <div class="prog-bar"><i id="pBar"></i></div>
+      </div>
+      <div class="cuerpo" id="cuerpoLista"></div>
+    </aside>
+  </div>
+</section>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+montarUI({ navClara: true, sinFooter: true });
+
+const p = findP(param('p')) || PROGRAMAS[0];
+if (!TONO.user) location.href = 'acceso.html?next=' + encodeURIComponent('clase.html?p=' + p.slug);
+const semanas = leccionesDe(p);
+const todas = semanas.flatMap(s => s.lecciones);
+let actual = param('l') || (function () {
+  const hechas = TONO.progreso(p.slug);
+  const sig = todas.find(l => !hechas.includes(l.id));
+  return (sig || todas[0]).id;
+})();
+
+document.getElementById('poster').src = p.img;
+document.getElementById('pTitulo').textContent = p.titulo;
+document.getElementById('verPrograma').href = 'programa.html?p=' + p.slug;
+document.getElementById('matNombre').textContent = p.material.split('(')[0].trim();
+
+function render() {
+  const hechas = TONO.progreso(p.slug);
+  const lec = todas.find(l => l.id === actual) || todas[0];
+  document.getElementById('tituloClase').textContent = lec.titulo;
+  document.getElementById('pMeta').textContent = hechas.length + ' de ' + todas.length + ' clases completadas';
+  document.getElementById('pBar').style.width = Math.round(hechas.length / todas.length * 100) + '%';
+  document.getElementById('cuerpoLista').innerHTML = semanas.map(s => `
+    <div class="sem-t">Semana ${s.semana}</div>
+    ${s.lecciones.map(l => `
+      <button class="llec ${l.id === actual ? 'actual' : ''} ${hechas.includes(l.id) ? 'hecha' : ''}" onclick="ir('${l.id}')">
+        <span class="est">${hechas.includes(l.id) ? '✓' : '▶'}</span>
+        <span>${l.titulo}</span>
+        <span class="dur">${l.dur}</span>
+      </button>`).join('')}`).join('');
+  // reset player
+  const pant = document.getElementById('pantalla');
+  pant.classList.remove('playing');
+  document.getElementById('vprog').style.width = '0';
+  clearInterval(window._vt);
+}
+
+function ir(id) { actual = id; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+function reproducir() {
+  const pant = document.getElementById('pantalla');
+  pant.classList.add('playing');
+  let t = 0;
+  clearInterval(window._vt);
+  window._vt = setInterval(() => {
+    t += 2;
+    document.getElementById('vprog').style.width = Math.min(t, 100) + '%';
+    if (t >= 100) clearInterval(window._vt);
+  }, 400);
+}
+
+function completar() {
+  TONO.completar(p.slug, actual);
+  const hechas = TONO.progreso(p.slug);
+  if (hechas.length === todas.length) {
+    TONO.notificar('¡Programa completado! 🏆', 'Terminaste ' + p.titulo + '. Tu constancia lo es todo.');
+    toast('🏆 ¡Completaste el programa entero! Increíble.');
+  } else {
+    const sig = todas.find(l => !hechas.includes(l.id));
+    if (sig) { actual = sig.id; toast('✓ Clase completada. Vamos con la siguiente.'); }
+  }
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

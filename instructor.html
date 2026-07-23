@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perfil del instructor — tono.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+/* cabecera perfil */
+.perfil { background: var(--ciruela); color: var(--crema); padding: calc(var(--nav-h) + 60px) 0 0; overflow: hidden; }
+.perfil-in { display: flex; gap: 60px; align-items: flex-end; }
+.perfil-txt { flex: 1; padding-bottom: 64px; }
+.perfil-txt .handle { color: var(--lila); font-weight: 600; margin-bottom: 10px; display: inline-flex; align-items: center; gap: 8px; }
+.perfil-txt h1 { font-size: clamp(2.4rem, 5.4vw, 4.2rem); font-weight: 800; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.perfil-txt .check { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--coral); font-size: 1rem; }
+.perfil-txt .rol { font-size: 1.15rem; opacity: .85; margin: 8px 0 20px; }
+.perfil-txt .bio { max-width: 56ch; opacity: .88; margin-bottom: 28px; }
+.perfil-stats { display: flex; gap: 40px; flex-wrap: wrap; margin-bottom: 30px; }
+.perfil-stats b { font-family: var(--f-display); font-size: 1.9rem; font-weight: 800; display: block; line-height: 1.1; }
+.perfil-stats span { font-size: .85rem; opacity: .7; }
+.perfil-foto { width: min(380px, 38vw); flex-shrink: 0; align-self: flex-end; }
+.perfil-foto img { border-radius: var(--r) var(--r) 0 0; aspect-ratio: 4/5; object-fit: cover; width: 100%; box-shadow: 0 -20px 60px rgba(0,0,0,.3); }
+.acciones { display: flex; gap: 12px; flex-wrap: wrap; }
+@media (max-width: 860px) {
+  .perfil-in { flex-direction: column-reverse; gap: 0; align-items: stretch; }
+  .perfil-foto { width: min(320px, 80%); margin: 0 auto; }
+  .perfil-txt { padding-bottom: 48px; }
+}
+
+/* muestra gratis */
+.muestra { position: relative; border-radius: var(--r); overflow: hidden; aspect-ratio: 16/7; display: flex; align-items: center; justify-content: center; color: var(--crema); box-shadow: var(--sombra); }
+.muestra img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.muestra::after { content: ''; position: absolute; inset: 0; background: rgba(36,27,43,.45); }
+.muestra .play { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 14px; background: none; border: none; color: var(--crema); }
+.muestra .play .btn-play { width: 84px; height: 84px; border-radius: 50%; background: var(--coral); display: grid; place-items: center; font-size: 1.7rem; transition: transform .2s ease; box-shadow: 0 16px 40px -10px rgba(255,90,60,.7); }
+.muestra .play:hover .btn-play { transform: scale(1.1); }
+.muestra .play b { font-family: var(--f-display); font-size: 1.25rem; }
+
+/* modal video */
+.vmodal { position: fixed; inset: 0; z-index: 300; background: rgba(24,16,29,.92); display: none; align-items: center; justify-content: center; padding: 24px; }
+.vmodal.open { display: flex; }
+.vmodal .caja { width: min(880px, 100%); }
+.vmodal .pantalla { aspect-ratio: 16/9; border-radius: var(--r); background: #000; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.vmodal .pantalla img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .55; }
+.vmodal .msg { position: relative; z-index: 2; text-align: center; color: var(--crema); padding: 20px; }
+.vmodal .msg .vlogo { font-weight: 800; font-family: var(--f-display); font-size: 1.3rem; letter-spacing: .02em; margin-bottom: 8px; }
+.vmodal .msg p { opacity: .8; font-size: .95rem; max-width: 40ch; }
+.vmodal .barra { position: absolute; z-index: 2; bottom: 0; left: 0; right: 0; height: 5px; background: rgba(255,255,255,.2); }
+.vmodal .barra i { display: block; height: 100%; width: 0; background: var(--coral); animation: prog 12s linear forwards; }
+@keyframes prog { to { width: 100%; } }
+.vmodal .cerrar { margin: 14px auto 0; display: block; }
+
+/* reseñas */
+.rsn { border-top: 1px solid var(--linea); padding: 26px 0; display: flex; gap: 24px; }
+.rsn .quien { flex-shrink: 0; width: 180px; font-weight: 700; }
+.rsn .quien .stars { color: var(--coral); font-size: .85rem; letter-spacing: 2px; }
+.rsn p { color: var(--tinta-60); }
+@media (max-width: 640px) { .rsn { flex-direction: column; gap: 8px; } }
+</style>
+</head>
+<body>
+
+<header class="perfil">
+  <div class="wrap perfil-in">
+    <div class="perfil-txt">
+      <span class="handle" id="handle"></span>
+      <h1 id="nombre"></h1>
+      <div class="rol" id="rol"></div>
+      <p class="bio" id="bio"></p>
+      <div class="perfil-stats" id="stats"></div>
+      <div class="acciones">
+        <a class="btn btn-coral" href="#programas">Ver programas</a>
+        <button class="btn btn-ghost" style="color:var(--crema)" id="compartir">🔗 Compartir perfil</button>
+      </div>
+    </div>
+    <div class="perfil-foto"><img id="foto" src="" alt=""></div>
+  </div>
+</header>
+
+<section class="sec" style="padding-bottom:50px">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div>
+        <div class="kicker">Clase de muestra</div>
+        <h2>Pruébala gratis</h2>
+      </div>
+      <p class="sec-sub">Una clase completa, sin registro, para que conozcas el método antes de comprar.</p>
+    </div>
+    <div class="muestra rv">
+      <img id="muestraImg" src="" alt="">
+      <button class="play" onclick="abrirVideo()">
+        <span class="btn-play">▶</span>
+        <b>Clase gratuita · 18 min</b>
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="programas" style="padding-top:50px">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div>
+        <div class="kicker">Catálogo</div>
+        <h2 id="tituloProgs">Programas</h2>
+      </div>
+    </div>
+    <div class="grid g3" id="progGrid"></div>
+  </div>
+</section>
+
+<section class="sec" style="padding-top:30px">
+  <div class="wrap" style="max-width:880px">
+    <div class="sec-head rv">
+      <div>
+        <div class="kicker">Reseñas</div>
+        <h2>Lo que dicen sus alumnos</h2>
+      </div>
+    </div>
+    <div id="resenas"></div>
+  </div>
+</section>
+
+<!-- modal video demo -->
+<div class="vmodal" id="vmodal">
+  <div class="caja">
+    <div class="pantalla">
+      <img id="vposter" src="" alt="">
+      <div class="msg">
+        <div class="vlogo">▶ vimeo</div>
+        <p>En la plataforma real, aquí se reproduce el video embebido desde Vimeo o YouTube, sin publicidad y con carga instantánea. Esta es una simulación del prototipo.</p>
+      </div>
+      <div class="barra"><i></i></div>
+    </div>
+    <button class="btn btn-blanco btn-sm cerrar" onclick="document.getElementById('vmodal').classList.remove('open')">Cerrar</button>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+montarUI({ navClara: true });
+
+const inst = findI(param('i')) || INSTRUCTORES[0];
+document.title = inst.nombre + ' — tono.';
+document.getElementById('handle').textContent = inst.handle;
+document.getElementById('nombre').innerHTML = inst.nombre + (inst.verificada ? ' <span class="check">✓</span>' : '');
+document.getElementById('rol').textContent = inst.rol;
+document.getElementById('bio').textContent = inst.bio;
+document.getElementById('foto').src = inst.img;
+document.getElementById('foto').alt = inst.nombre;
+
+const progs = PROGRAMAS.filter(p => p.instructor === inst.slug);
+document.getElementById('stats').innerHTML = `
+  <div><b>${inst.alumnos.toLocaleString('es-CO')}</b><span>alumnos</span></div>
+  <div><b>${progs.length}</b><span>programas</span></div>
+  <div><b>★ ${inst.rating}</b><span>${inst.resenas} reseñas</span></div>`;
+document.getElementById('tituloProgs').textContent = 'Programas de ' + inst.nombre.split(' ')[0];
+document.getElementById('progGrid').innerHTML = progs.map(pcardHTML).join('');
+document.getElementById('muestraImg').src = (progs[0] || PROGRAMAS[0]).img;
+document.getElementById('vposter').src = (progs[0] || PROGRAMAS[0]).img;
+
+document.getElementById('resenas').innerHTML = RESENAS.map(r => `
+  <div class="rsn rv">
+    <div class="quien">${r.n}<div class="stars">${'★'.repeat(r.r)}</div></div>
+    <p>${r.t}</p>
+  </div>`).join('');
+
+document.getElementById('compartir').onclick = async () => {
+  const url = new URL('instructor.html?i=' + inst.slug, location.href).href;
+  try { await navigator.clipboard.writeText(url); } catch {}
+  toast('Enlace copiado — pégalo en tu publicidad o redes: un clic lleva directo a este perfil');
+};
+
+function abrirVideo() { document.getElementById('vmodal').classList.add('open'); }
+
+document.querySelectorAll('.rv:not(.in)').forEach(el => {
+  new IntersectionObserver((es, o) => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); o.unobserve(e.target); } }), { threshold: .1 }).observe(el);
+});
+</script>
+</body>
+</html>

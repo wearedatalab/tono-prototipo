@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pago seguro — tono.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+.co { padding: calc(var(--nav-h) + 44px) 0 90px; }
+.co-grid { display: grid; grid-template-columns: 1fr 420px; gap: 46px; align-items: start; }
+@media (max-width: 960px) { .co-grid { grid-template-columns: 1fr; } }
+.co h1 { font-size: clamp(1.9rem, 4vw, 2.7rem); font-weight: 800; margin-bottom: 6px; }
+.seguro { display: inline-flex; align-items: center; gap: 8px; font-size: .85rem; color: var(--tinta-60); margin-bottom: 30px; }
+/* métodos */
+.metodos { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+.metodo {
+  flex: 1; min-width: 110px; padding: 14px; border-radius: var(--r-sm); border: 1.5px solid var(--linea);
+  background: var(--blanco); font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  transition: all .15s ease; font-size: .95rem;
+}
+.metodo small { font-weight: 500; color: var(--tinta-60); font-size: .75rem; }
+.metodo.on { border-color: var(--coral); background: rgba(255,90,60,.06); box-shadow: 0 0 0 1px var(--coral); }
+.fpago { background: var(--blanco); border: 1.5px solid var(--linea); border-radius: var(--r); padding: 26px; display: grid; gap: 18px; }
+.f2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.pse-msg, .nequi-msg { background: var(--crema-2); border-radius: var(--r-sm); padding: 18px; font-size: .95rem; color: var(--tinta-60); }
+/* resumen */
+.resumen { background: var(--blanco); border-radius: var(--r); box-shadow: var(--sombra); overflow: hidden; position: sticky; top: calc(var(--nav-h) + 20px); }
+.resumen img { aspect-ratio: 16/8; object-fit: cover; width: 100%; }
+.resumen .rb { padding: 24px; }
+.resumen h3 { font-size: 1.3rem; margin-bottom: 4px; }
+.resumen .por { color: var(--tinta-60); font-size: .9rem; margin-bottom: 18px; }
+.linea-r { display: flex; justify-content: space-between; padding: 9px 0; font-size: .95rem; border-bottom: 1px solid var(--linea); }
+.linea-r.total { border: none; font-family: var(--f-display); font-weight: 800; font-size: 1.35rem; padding-top: 16px; }
+.badge-exento { background: rgba(62,155,108,.12); color: var(--ok); font-size: .78rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
+/* estados pago */
+.overlay { position: fixed; inset: 0; z-index: 400; background: rgba(246,241,233,.96); display: none; align-items: center; justify-content: center; text-align: center; padding: 24px; }
+.overlay.open { display: flex; }
+.spinner { width: 64px; height: 64px; border-radius: 50%; border: 5px solid var(--crema-2); border-top-color: var(--coral); animation: spin 1s linear infinite; margin: 0 auto 26px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.ok-big { width: 96px; height: 96px; border-radius: 50%; background: var(--ok); color: #fff; display: grid; place-items: center; font-size: 2.6rem; margin: 0 auto 26px; animation: pop .5s cubic-bezier(.2,1.6,.4,1); }
+@keyframes pop { from { transform: scale(0); } }
+.overlay h2 { font-size: clamp(1.6rem, 3.5vw, 2.3rem); margin-bottom: 10px; }
+.overlay p { color: var(--tinta-60); max-width: 44ch; margin: 0 auto 8px; }
+/* mini correo confirmación */
+.mailcard { max-width: 460px; margin: 26px auto; text-align: left; border: 1.5px solid var(--linea); border-radius: var(--r-sm); background: var(--blanco); overflow: hidden; box-shadow: var(--sombra); }
+.mailcard .mh { background: var(--crema-2); padding: 9px 16px; font-size: .78rem; font-weight: 600; color: var(--tinta-60); }
+.mailcard .mb { padding: 16px 18px; font-size: .9rem; }
+.mailcard .mb b { display: block; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<section class="co">
+  <div class="wrap">
+    <h1>Pago seguro</h1>
+    <div class="seguro">🔒 Conexión cifrada · procesado por tu pasarela de pagos (Wompi / ePayco / Mercado Pago)</div>
+
+    <div class="co-grid">
+      <div>
+        <div class="metodos" id="metodos">
+          <button class="metodo on" data-m="tarjeta">💳 Tarjeta<small>Crédito o débito</small></button>
+          <button class="metodo" data-m="pse">🏦 PSE<small>Débito bancario</small></button>
+          <button class="metodo" data-m="nequi">📱 Nequi<small>Desde tu celular</small></button>
+        </div>
+
+        <form class="fpago" id="fTarjeta" onsubmit="return pagar(event)">
+          <div class="field"><label>Nombre en la tarjeta</label><input value="DANIELA TORRES" required></div>
+          <div class="field"><label>Número de tarjeta</label><input value="4242 4242 4242 4242" inputmode="numeric" required></div>
+          <div class="f2">
+            <div class="field"><label>Vence</label><input value="08/29" required></div>
+            <div class="field"><label>CVC</label><input value="123" inputmode="numeric" required></div>
+          </div>
+          <button class="btn btn-coral" type="submit" id="btnPagar">Pagar</button>
+          <p style="font-size:.8rem;color:var(--tinta-30);text-align:center">Demo: no se procesa ningún cobro real.</p>
+        </form>
+
+        <div class="fpago oculto" id="fPse">
+          <div class="pse-msg">En la plataforma real serás redirigida al portal de tu banco para autorizar el débito. Al confirmar, tu acceso se activa automáticamente.</div>
+          <div class="field"><label>Banco</label>
+            <select><option>Bancolombia</option><option>Davivienda</option><option>BBVA</option><option>Banco de Bogotá</option><option>Nequi</option></select>
+          </div>
+          <button class="btn btn-coral" onclick="pagar(event)">Continuar al banco</button>
+        </div>
+
+        <div class="fpago oculto" id="fNequi">
+          <div class="nequi-msg">Recibirás una notificación en tu app Nequi para aprobar el pago con un toque.</div>
+          <div class="field"><label>Número de celular</label><input value="310 456 7890" inputmode="tel"></div>
+          <button class="btn btn-coral" onclick="pagar(event)">Enviar solicitud a Nequi</button>
+        </div>
+      </div>
+
+      <aside class="resumen" id="resumen"></aside>
+    </div>
+  </div>
+</section>
+
+<!-- procesando -->
+<div class="overlay" id="ovProc">
+  <div>
+    <div class="spinner"></div>
+    <h2>Procesando tu pago…</h2>
+    <p>Estamos confirmando la transacción con la pasarela. No cierres esta ventana.</p>
+  </div>
+</div>
+
+<!-- éxito -->
+<div class="overlay" id="ovOk">
+  <div style="max-width:640px">
+    <div class="ok-big">✓</div>
+    <h2>¡Pago aprobado, acceso activado!</h2>
+    <p>Tu programa ya está disponible. Así se ve el correo de confirmación que llega en la plataforma real:</p>
+    <div class="mailcard">
+      <div class="mh">📧 <b>tono.</b> — Confirmación de compra</div>
+      <div class="mb">
+        <b>¡Tu compra fue exitosa! 🎉</b>
+        <span id="mailTexto"></span>
+      </div>
+    </div>
+    <a class="btn btn-coral" id="irClase" href="#">Empezar a entrenar ahora</a>
+    <div style="margin-top:12px"><a class="btn btn-ghost btn-sm" href="mi-entrenamiento.html">Ir a mi entrenamiento</a></div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+montarUI({ sinFooter: true });
+
+if (!TONO.user) location.href = 'acceso.html?next=' + encodeURIComponent(location.pathname.split('/').pop() + location.search);
+
+const p = findP(param('p')) || PROGRAMAS[0];
+const inst = findI(p.instructor);
+
+document.getElementById('resumen').innerHTML = `
+  <img src="${p.img}" alt="${p.titulo}">
+  <div class="rb">
+    <h3>${p.titulo}</h3>
+    <div class="por">por ${inst.nombre} · ${p.semanas} semanas · ${p.sesiones} clases</div>
+    <div class="linea-r"><span>Programa</span><span>${$fmt(p.precio)}</span></div>
+    <div class="linea-r"><span>IVA</span><span class="badge-exento">Exento</span></div>
+    <div class="linea-r total"><span>Total</span><span>${$fmt(p.precio)}</span></div>
+  </div>`;
+document.getElementById('btnPagar').textContent = 'Pagar ' + $fmt(p.precio);
+
+// tabs métodos
+document.getElementById('metodos').addEventListener('click', e => {
+  const b = e.target.closest('.metodo'); if (!b) return;
+  e.preventDefault();
+  document.querySelectorAll('.metodo').forEach(x => x.classList.remove('on'));
+  b.classList.add('on');
+  const m = b.dataset.m;
+  document.getElementById('fTarjeta').classList.toggle('oculto', m !== 'tarjeta');
+  document.getElementById('fPse').classList.toggle('oculto', m !== 'pse');
+  document.getElementById('fNequi').classList.toggle('oculto', m !== 'nequi');
+});
+
+function pagar(e) {
+  e.preventDefault();
+  document.getElementById('ovProc').classList.add('open');
+  setTimeout(() => {
+    document.getElementById('ovProc').classList.remove('open');
+    TONO.comprar(p.slug);
+    TONO.notificar('Compra confirmada ✓', p.titulo + ' ya está en tu biblioteca. ¡A entrenar!');
+    document.getElementById('mailTexto').textContent =
+      `Hola ${TONO.user.nombre.split(' ')[0]}: tu acceso a "${p.titulo}" de ${inst.nombre} quedó activado. Entra cuando quieras desde cualquier dispositivo.`;
+    document.getElementById('irClase').href = 'clase.html?p=' + p.slug;
+    document.getElementById('ovOk').classList.add('open');
+  }, 2000);
+  return false;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel del instructor — tono.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+body { background: #F1EAE0; }
+.shell { display: grid; grid-template-columns: 250px 1fr; min-height: 100svh; }
+@media (max-width: 900px) { .shell { grid-template-columns: 1fr; } .side { position: static !important; height: auto !important; flex-direction: row !important; overflow-x: auto; padding: 14px !important; } .side .quien, .side .abajo { display: none !important; } }
+.side { background: var(--ciruela-d); color: var(--crema); padding: 26px 18px; display: flex; flex-direction: column; gap: 4px; position: sticky; top: 0; height: 100svh; }
+.side .logo { font-size: 1.5rem; margin: 0 10px 22px; }
+.side .quien { display: flex; align-items: center; gap: 12px; padding: 12px 10px; border-radius: var(--r-sm); background: rgba(246,241,233,.06); margin-bottom: 18px; }
+.side .quien img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; }
+.side .quien b { display: block; font-size: .95rem; line-height: 1.2; }
+.side .quien span { font-size: .75rem; opacity: .6; }
+.stab { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: var(--r-sm); background: none; border: none; color: var(--crema); font-size: .95rem; font-weight: 600; opacity: .7; transition: all .15s; text-align: left; white-space: nowrap; }
+.stab:hover { opacity: 1; background: rgba(246,241,233,.06); }
+.stab.on { opacity: 1; background: var(--coral); }
+.side .abajo { margin-top: auto; font-size: .78rem; opacity: .5; padding: 0 10px; }
+.main { padding: clamp(22px, 4vw, 44px); }
+.main h1 { font-size: clamp(1.6rem, 3.2vw, 2.3rem); font-weight: 800; margin-bottom: 4px; }
+.main .sub { color: var(--tinta-60); margin-bottom: 30px; font-size: .95rem; }
+.vista { display: none; }
+.vista.on { display: block; animation: fade .3s ease; }
+@keyframes fade { from { opacity: 0; transform: translateY(8px); } }
+/* KPIs */
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 26px; }
+@media (max-width: 1100px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+.kpi { background: var(--blanco); border-radius: var(--r-sm); padding: 20px 22px; border: 1px solid var(--linea); }
+.kpi .l { font-size: .8rem; font-weight: 600; color: var(--tinta-60); }
+.kpi b { font-family: var(--f-display); font-size: 1.7rem; font-weight: 800; display: block; margin-top: 4px; }
+.kpi .delta { font-size: .78rem; font-weight: 700; color: var(--ok); }
+/* panel bloques */
+.bloque { background: var(--blanco); border: 1px solid var(--linea); border-radius: var(--r-sm); padding: 24px; margin-bottom: 22px; }
+.bloque h3 { font-size: 1.05rem; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
+.bloque h3 small { font-weight: 500; color: var(--tinta-60); font-size: .8rem; }
+/* chart barras */
+.chart { display: flex; align-items: flex-end; gap: 14px; height: 180px; }
+.chart .col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end; }
+.chart .bar { width: 100%; max-width: 54px; border-radius: 8px 8px 0 0; background: var(--ciruela); transition: height .8s cubic-bezier(.2,.7,.2,1); }
+.chart .col:last-child .bar { background: var(--coral); }
+.chart .m { font-size: .75rem; color: var(--tinta-60); font-weight: 600; }
+.chart .v { font-size: .72rem; font-weight: 700; }
+/* tablas */
+table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+th { text-align: left; font-size: .74rem; text-transform: uppercase; letter-spacing: .08em; color: var(--tinta-60); padding: 10px 12px; border-bottom: 1.5px solid var(--linea); }
+td { padding: 13px 12px; border-bottom: 1px solid var(--linea); }
+tr:last-child td { border-bottom: none; }
+.pill { font-size: .74rem; font-weight: 700; padding: 4px 12px; border-radius: 999px; }
+.pill.ok { background: rgba(62,155,108,.13); color: var(--ok); }
+.pill.warn { background: rgba(255,90,60,.13); color: var(--coral-d); }
+.pill.mut { background: var(--crema-2); color: var(--tinta-60); }
+.mini-prog { width: 110px; height: 6px; border-radius: 99px; background: var(--crema-2); overflow: hidden; display: inline-block; vertical-align: middle; }
+.mini-prog i { display: block; height: 100%; background: var(--ok); border-radius: 99px; }
+/* wizard */
+.wsteps { display: flex; gap: 10px; margin-bottom: 26px; }
+.wstep { flex: 1; padding: 12px; text-align: center; border-radius: var(--r-sm); background: var(--blanco); border: 1.5px solid var(--linea); font-weight: 600; font-size: .88rem; color: var(--tinta-60); }
+.wstep.on { border-color: var(--coral); color: var(--tinta); background: rgba(255,90,60,.05); }
+.wstep.done { border-color: var(--ok); color: var(--ok); }
+.wpane { display: none; } .wpane.on { display: grid; gap: 18px; animation: fade .3s ease; }
+.video-row { display: flex; gap: 12px; align-items: center; }
+.video-row input { flex: 1; }
+.video-row .vok { color: var(--ok); font-weight: 700; font-size: .85rem; white-space: nowrap; }
+.prev-card { max-width: 380px; }
+.f2c { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+@media (max-width: 700px) { .f2c { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="side">
+    <a class="logo" href="index.html">tono<i>.</i></a>
+    <div class="quien">
+      <img src="img/valentina.jpg" alt="">
+      <div><b>Valentina Ríos</b><span>Instructora · Pilates & Core</span></div>
+    </div>
+    <button class="stab on" data-v="resumen">📊 Resumen</button>
+    <button class="stab" data-v="programas">🎬 Mis programas</button>
+    <button class="stab" data-v="publicar">✚ Publicar programa</button>
+    <button class="stab" data-v="alumnos">👥 Mis alumnos</button>
+    <button class="stab" data-v="perfil">👤 Mi perfil público</button>
+    <div class="abajo">Demo del módulo del instructor.<br>Sesión simulada: Valentina Ríos.</div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ===== RESUMEN ===== -->
+    <section class="vista on" id="v-resumen">
+      <h1>Hola, Valentina 👋</h1>
+      <p class="sub">Así van tus programas este mes. Corte: hoy, actualizado en tiempo real.</p>
+      <div class="kpis">
+        <div class="kpi"><span class="l">Ventas del mes</span><b>38</b><span class="delta">▲ 12% vs. mes anterior</span></div>
+        <div class="kpi"><span class="l">Ingresos del mes</span><b>$4.312.000</b><span class="delta">▲ 9%</span></div>
+        <div class="kpi"><span class="l">Alumnos activos</span><b>1.284</b><span class="delta">▲ 41 nuevos</span></div>
+        <div class="kpi"><span class="l">Calificación</span><b>★ 4.9</b><span class="delta">312 reseñas</span></div>
+      </div>
+      <div class="bloque">
+        <h3>Ventas por mes <small>últimos 6 meses · COP</small></h3>
+        <div class="chart" id="chart"></div>
+      </div>
+      <div class="bloque">
+        <h3>Últimas ventas <small>notificadas también a tu correo</small></h3>
+        <table>
+          <thead><tr><th>Alumno</th><th>Programa</th><th>Valor</th><th>Fecha</th></tr></thead>
+          <tbody id="ventasBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== PROGRAMAS ===== -->
+    <section class="vista" id="v-programas">
+      <h1>Mis programas</h1>
+      <p class="sub">Publica, edita u oculta tus programas sin depender de un desarrollador.</p>
+      <div class="bloque">
+        <table>
+          <thead><tr><th>Programa</th><th>Estado</th><th>Alumnos</th><th>Precio</th><th>Rating</th><th></th></tr></thead>
+          <tbody id="progsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== PUBLICAR ===== -->
+    <section class="vista" id="v-publicar">
+      <h1>Publicar un programa nuevo</h1>
+      <p class="sub">Tres pasos: información, contenido en video y precio. Tus videos viven en Vimeo o YouTube y se embeben automáticamente.</p>
+      <div class="wsteps">
+        <div class="wstep on" id="ws1">1 · Información</div>
+        <div class="wstep" id="ws2">2 · Contenido</div>
+        <div class="wstep" id="ws3">3 · Precio y publicación</div>
+      </div>
+
+      <div class="bloque wpane on" id="wp1">
+        <div class="f2c">
+          <div class="field"><label>Nombre del programa</label><input id="npNombre" placeholder="Ej: Pilates para espalda feliz" value="Pilates para Espalda Feliz"></div>
+          <div class="field"><label>Categoría</label><select id="npCat"><option value="pilates">Pilates</option><option value="funcional">Funcional</option><option value="fuerza">Fuerza</option><option value="estiramientos">Estiramientos</option><option value="nutricion">Nutrición</option></select></div>
+        </div>
+        <div class="f2c">
+          <div class="field"><label>Nivel</label><select id="npNivel"><option>Principiante</option><option>Intermedio</option><option>Avanzado</option><option>Todos los niveles</option></select></div>
+          <div class="field"><label>Duración</label><select id="npDur"><option>3 semanas</option><option selected>4 semanas</option><option>6 semanas</option><option>8 semanas</option></select></div>
+        </div>
+        <div class="field"><label>Descripción corta</label><textarea id="npDesc" rows="3" placeholder="¿Qué logra el alumno con este programa?">Cuatro semanas de pilates terapéutico para liberar tensión lumbar y construir una espalda fuerte y sin dolor.</textarea></div>
+        <button class="btn btn-coral" style="justify-self:start" onclick="wiz(2)">Continuar →</button>
+      </div>
+
+      <div class="bloque wpane" id="wp2">
+        <div class="field"><label>Videos del programa (enlaces de Vimeo o YouTube)</label></div>
+        <div class="video-row"><input value="https://vimeo.com/9834721/clase-1-fundamentos" readonly><span class="vok">✓ Video válido</span></div>
+        <div class="video-row"><input value="https://vimeo.com/9834722/clase-2-respiracion" readonly><span class="vok">✓ Video válido</span></div>
+        <div class="video-row"><input id="npVideo3" placeholder="Pega aquí el enlace de tu siguiente video…"><button class="btn btn-tinta btn-sm" onclick="agregarVideo()">Agregar</button></div>
+        <div class="field" style="margin-top:8px"><label>Material complementario (PDF)</label>
+          <div class="video-row"><input value="Guía de higiene postural.pdf" readonly><span class="vok">✓ Cargado</span></div>
+        </div>
+        <div style="display:flex;gap:12px"><button class="btn btn-ghost btn-sm" onclick="wiz(1)">← Volver</button><button class="btn btn-coral" onclick="wiz(3)">Continuar →</button></div>
+      </div>
+
+      <div class="bloque wpane" id="wp3">
+        <div class="f2c">
+          <div class="field"><label>Precio (COP, pago único)</label><input id="npPrecio" value="94.900" inputmode="numeric"></div>
+          <div class="field"><label>Clase gratuita de muestra</label><select><option>Clase 1 · Fundamentos</option><option>Ninguna</option></select></div>
+        </div>
+        <p class="mut" style="font-size:.9rem">Así se verá tu programa en el marketplace:</p>
+        <div class="prev-card" id="prevCard"></div>
+        <div style="display:flex;gap:12px"><button class="btn btn-ghost btn-sm" onclick="wiz(2)">← Volver</button><button class="btn btn-coral" onclick="publicarNuevo()">🚀 Publicar programa</button></div>
+      </div>
+    </section>
+
+    <!-- ===== ALUMNOS ===== -->
+    <section class="vista" id="v-alumnos">
+      <h1>Mis alumnos</h1>
+      <p class="sub">Inscripciones en tus programas y su avance. Los datos son demo.</p>
+      <div class="bloque">
+        <table>
+          <thead><tr><th>Alumno</th><th>Programa</th><th>Avance</th><th>Última actividad</th></tr></thead>
+          <tbody id="alumnosBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== PERFIL ===== -->
+    <section class="vista" id="v-perfil">
+      <h1>Mi perfil público</h1>
+      <p class="sub">Lo que ven tus alumnos en <a href="instructor.html?i=valentina-rios" style="color:var(--coral);font-weight:600">tono.fit/valentina-rios</a> — compártelo en tu publicidad.</p>
+      <div class="bloque" style="max-width:720px">
+        <div style="display:flex;gap:20px;align-items:center;margin-bottom:22px">
+          <img src="img/valentina.jpg" style="width:84px;height:84px;border-radius:50%;object-fit:cover" alt="">
+          <button class="btn btn-ghost btn-sm" onclick="toast('En la plataforma real aquí subes o cambias tu foto')">Cambiar foto</button>
+        </div>
+        <div class="f2c">
+          <div class="field"><label>Nombre público</label><input value="Valentina Ríos"></div>
+          <div class="field"><label>Especialidad</label><input value="Pilates & Core"></div>
+        </div>
+        <div class="field" style="margin-top:18px"><label>Presentación</label><textarea rows="4">Instructora certificada de pilates mat y reformer con 9 años de experiencia en estudios boutique de Bogotá. Mi método combina control, respiración y fuerza profunda del core.</textarea></div>
+        <button class="btn btn-coral" style="margin-top:18px" onclick="toast('✓ Perfil actualizado (demo) — los cambios se verían al instante en tu página pública')">Guardar cambios</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>
+// tabs
+document.querySelectorAll('.stab').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.stab').forEach(x => x.classList.remove('on'));
+  document.querySelectorAll('.vista').forEach(x => x.classList.remove('on'));
+  b.classList.add('on');
+  document.getElementById('v-' + b.dataset.v).classList.add('on');
+});
+
+// chart
+const meses = [['Feb', 2.1], ['Mar', 2.8], ['Abr', 2.6], ['May', 3.4], ['Jun', 3.9], ['Jul', 4.3]];
+const max = 4.5;
+document.getElementById('chart').innerHTML = meses.map(([m, v]) => `
+  <div class="col"><span class="v">$${v.toFixed(1)}M</span><div class="bar" style="height:${v / max * 100}%"></div><span class="m">${m}</span></div>`).join('');
+
+// ventas demo
+const ventas = [
+  ['Daniela T.', 'Core 21 Días', 79900, 'Hoy, 9:14 a. m.'],
+  ['Paula A.', 'Reformer en Casa', 129900, 'Hoy, 7:52 a. m.'],
+  ['Juliana V.', 'Core 21 Días', 79900, 'Ayer, 8:31 p. m.'],
+  ['Carolina M.', 'Reformer en Casa', 129900, 'Ayer, 6:05 p. m.'],
+  ['Andrea S.', 'Core 21 Días', 79900, '21 jul, 10:22 a. m.'],
+];
+document.getElementById('ventasBody').innerHTML = ventas.map(v =>
+  `<tr><td><b>${v[0]}</b></td><td>${v[1]}</td><td>${$fmt(v[2])}</td><td class="mut">${v[3]}</td></tr>`).join('');
+
+// mis programas (de Valentina) + estado
+function renderProgs() {
+  const mios = PROGRAMAS.filter(p => p.instructor === 'valentina-rios');
+  const extra = TONO.read('prog_nuevo', null);
+  const filas = mios.map(p => `
+    <tr><td><b>${p.titulo}</b></td><td><span class="pill ok">Publicado</span></td><td>${p.alumnos}</td><td>${$fmt(p.precio)}</td><td>★ ${p.rating}</td>
+    <td><a href="programa.html?p=${p.slug}" style="color:var(--coral);font-weight:600;font-size:.85rem">Ver →</a></td></tr>`);
+  if (extra) filas.push(`
+    <tr><td><b>${extra.nombre}</b></td><td><span class="pill warn">Recién publicado</span></td><td>0</td><td>$${extra.precio}</td><td class="mut">—</td><td></td></tr>`);
+  document.getElementById('progsBody').innerHTML = filas.join('');
+}
+renderProgs();
+
+// alumnos demo
+const als = [
+  ['Daniela Torres', 'Core 21 Días', 34, 'Hoy'],
+  ['Paula Arango', 'Reformer en Casa', 8, 'Hoy'],
+  ['Juliana Vega', 'Core 21 Días', 71, 'Ayer'],
+  ['Carolina Mora', 'Reformer en Casa', 55, 'Hace 2 días'],
+  ['Andrea Salazar', 'Core 21 Días', 90, 'Hace 3 días'],
+  ['Luisa Cárdenas', 'Reformer en Casa', 12, 'Hace 5 días'],
+];
+document.getElementById('alumnosBody').innerHTML = als.map(a => `
+  <tr><td><b>${a[0]}</b></td><td>${a[1]}</td>
+  <td><span class="mini-prog"><i style="width:${a[2]}%"></i></span> <span class="mut" style="font-size:.82rem">${a[2]}%</span></td>
+  <td class="mut">${a[3]}</td></tr>`).join('');
+
+// wizard
+function wiz(n) {
+  [1, 2, 3].forEach(i => {
+    document.getElementById('ws' + i).className = 'wstep' + (i === n ? ' on' : i < n ? ' done' : '');
+    document.getElementById('wp' + i).classList.toggle('on', i === n);
+  });
+  if (n === 3) {
+    const nombre = document.getElementById('npNombre').value || 'Tu programa';
+    document.getElementById('prevCard').innerHTML = `
+      <div class="pcard" style="box-shadow:var(--sombra)">
+        <div class="ph"><img src="img/p-movilidad.jpg" alt=""><span class="tag">${catLabel(document.getElementById('npCat').value)}</span></div>
+        <div class="pc-body"><h3>${nombre}</h3>
+        <div class="pc-inst"><img src="img/valentina.jpg" alt="">Valentina Ríos</div>
+        <div class="pc-foot"><span class="precio">$${document.getElementById('npPrecio').value}</span><span class="rating mut">Nuevo</span></div></div>
+      </div>`;
+  }
+}
+function agregarVideo() {
+  const i = document.getElementById('npVideo3');
+  if (!i.value.trim()) { toast('Pega un enlace de Vimeo o YouTube'); return; }
+  const row = document.createElement('div');
+  row.className = 'video-row';
+  row.innerHTML = `<input value="${i.value}" readonly><span class="vok">✓ Video válido</span>`;
+  i.closest('.video-row').before(row);
+  i.value = '';
+  toast('Video agregado al programa');
+}
+function publicarNuevo() {
+  TONO.write('prog_nuevo', { nombre: document.getElementById('npNombre').value, precio: document.getElementById('npPrecio').value });
+  renderProgs();
+  toast('🚀 ¡Programa publicado! Ya aparece en tu catálogo y en el marketplace (demo)');
+  setTimeout(() => document.querySelector('[data-v="programas"]').click(), 900);
+}
+</script>
+</body>
+</html>
