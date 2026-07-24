@@ -1,10 +1,18 @@
-// tabs
+// tabs — cada vista tiene su propia URL (admin.html#usuarios)
 document.querySelectorAll('.stab').forEach(b => b.onclick = () => {
   document.querySelectorAll('.stab').forEach(x => x.classList.remove('on'));
   document.querySelectorAll('.vista').forEach(x => x.classList.remove('on'));
   b.classList.add('on');
   document.getElementById('v-' + b.dataset.v).classList.add('on');
+  history.replaceState(null, '', '#' + b.dataset.v);
 });
+
+function abrirVista(v) {
+  const b = document.querySelector('.stab[data-v="' + v + '"]');
+  if (b) b.click();
+}
+if (location.hash) abrirVista(location.hash.slice(1));
+window.addEventListener('hashchange', () => abrirVista(location.hash.slice(1)));
 
 // chart
 const meses = [['Feb', 9.2], ['Mar', 11.5], ['Abr', 10.8], ['May', 14.1], ['Jun', 15.9], ['Jul', 18.4]];

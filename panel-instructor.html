@@ -205,13 +205,21 @@ tr:last-child td { border-bottom: none; }
 <script src="data.js"></script>
 <script src="app.js"></script>
 <script>
-// tabs
+// tabs — cada vista tiene su propia URL (panel-instructor.html#publicar)
 document.querySelectorAll('.stab').forEach(b => b.onclick = () => {
   document.querySelectorAll('.stab').forEach(x => x.classList.remove('on'));
   document.querySelectorAll('.vista').forEach(x => x.classList.remove('on'));
   b.classList.add('on');
   document.getElementById('v-' + b.dataset.v).classList.add('on');
+  history.replaceState(null, '', '#' + b.dataset.v);
 });
+
+function abrirVista(v) {
+  const b = document.querySelector('.stab[data-v="' + v + '"]');
+  if (b) b.click();
+}
+if (location.hash) abrirVista(location.hash.slice(1));
+window.addEventListener('hashchange', () => abrirVista(location.hash.slice(1)));
 
 // chart
 const meses = [['Feb', 2.1], ['Mar', 2.8], ['Abr', 2.6], ['May', 3.4], ['Jun', 3.9], ['Jul', 4.3]];
